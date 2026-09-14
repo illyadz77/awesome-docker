@@ -1,4 +1,4 @@
-﻿## Compose sample application
+## Compose sample application
 ### Python/FastAPI application with Ollama (Local LLM Inference)
 
 Project structure:
@@ -24,6 +24,14 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    # Uncomment below to enable NVIDIA GPU acceleration (requires NVIDIA Container Toolkit)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
   web:
     build: .
@@ -93,9 +101,38 @@ Response:
 }
 ```
 
+### Test Streaming Generation
+
+Send a streaming prompt to `/generate`:
+
+```console
+$ curl -N -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Count to 5", "stream": true}'
+```
+
 ### Interactive API Documentation
 
-Visit `http://localhost:8000/docs` to test endpoints interactively via Swagger UI.
+Visit `http://localhost:8000/docs` to test all endpoints interactively via Swagger UI.
+
+## GPU Acceleration (Optional)
+
+To run Ollama with NVIDIA GPU acceleration for faster inference:
+1. Ensure the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) is installed on your host system.
+2. In `compose.yaml`, uncomment the `deploy` reservation block under the `ollama` service:
+   ```yaml
+   deploy:
+     resources:
+       reservations:
+         devices:
+           - driver: nvidia
+             count: all
+             capabilities: [gpu]
+   ```
+3. Restart the stack:
+   ```console
+   $ docker compose up -d
+   ```
 
 ## Stop and remove the containers
 

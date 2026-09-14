@@ -1,4 +1,4 @@
-﻿services:
+services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
@@ -7,6 +7,14 @@
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    # Uncomment below to enable NVIDIA GPU acceleration (requires NVIDIA Container Toolkit)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
   web:
     build: .
